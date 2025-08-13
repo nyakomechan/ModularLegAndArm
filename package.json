@@ -1,0 +1,14 @@
+{
+  "name": "com.nyakomake.modular-leg-and-arm",
+  "displayName": "Modular Leg And Arm",
+  "version": "1.0.0",
+  "author": {
+    "name": "Nyakome"
+  },
+  "unity" : "2022.3",
+  "description" : "Package for explanation.",
+  "vpmDependencies" : {
+    "com.vrchat.avatars" : "3.7.0",
+    "com.anatawa12.avatar-optimizer" : "1.8.13"
+  }
+}
