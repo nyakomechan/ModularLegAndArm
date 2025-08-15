@@ -53,7 +53,7 @@ public class RemoveMeshHelperEditor : Editor
 
                 // ドロップダウンリストを表示
                 var newSelectNum = EditorGUILayout.Popup("ポリゴンを削除するSkinnedMeshRenderer", removeMeshHelper.selectNum, skinnedMeshRendererNames);
-                if (newSelectNum != removeMeshHelper.selectNum)
+                if (newSelectNum != removeMeshHelper.selectNum) //通常：インスペクタのリストから値を変更した場合
                 {
                     removeMeshHelper.selectNum = newSelectNum;
                     if (removeMeshHelper.removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshHelper.removeMeshInBox);
@@ -66,9 +66,10 @@ public class RemoveMeshHelperEditor : Editor
                         SetRemoveMeshBox(removeMeshHelper, selectedRenderer.gameObject);
                         //EditorUtility.SetDirty(removeMeshHelper);
                     }
-                    EditorUtility.SetDirty(removeMeshHelper);
+                    //EditorUtility.SetDirty(removeMeshHelper);
                 }
-                else if (removeMeshHelper.removeMeshInBox == null && newSelectNum != 0)
+                //リストから値を変更していない：selectNumが0(none)でない場合にヒエラルキーを移動→元に戻した時？　インスペクタの操作以外でも発火する場合がある
+                else if (removeMeshHelper.removeMeshInBox == null && newSelectNum != 0) 
                 {
                     if (removeMeshHelper.selectNum != 0)
                     {
@@ -76,14 +77,22 @@ public class RemoveMeshHelperEditor : Editor
                         removeMeshHelper.attachObject = selectedRenderer.gameObject;
                         Debug.Log(message: "Selected SkinnedMeshRenderer: " + selectedRenderer.gameObject.name);
                         SetRemoveMeshBox(removeMeshHelper, selectedRenderer.gameObject);
+
+                        //インスペクタの操作以外ではUndoに記録せず、変更フラグのみ付ける
+                        var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+                        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
                     }
-                    EditorUtility.SetDirty(removeMeshHelper);
+                    //EditorUtility.SetDirty(removeMeshHelper);
                 }
+                //リストから値を変更していない：selectNumが0(none)の場合
                 else if (newSelectNum == 0)
                 {
                     removeMeshHelper.selectNum = 0;
-                    if (removeMeshHelper.removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshHelper.removeMeshInBox);
-                    EditorUtility.SetDirty(removeMeshHelper);
+                    if (removeMeshHelper.removeMeshInBox != null) 
+                    {
+                        Undo.DestroyObjectImmediate(removeMeshHelper.removeMeshInBox);
+                    }
+                    //EditorUtility.SetDirty(removeMeshHelper);
                 }
 
 
@@ -99,7 +108,7 @@ public class RemoveMeshHelperEditor : Editor
         else
         {
             if (removeMeshHelper.removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshHelper.removeMeshInBox);
-            EditorUtility.SetDirty(removeMeshHelper);
+            //EditorUtility.SetDirty(removeMeshHelper);
             EditorGUILayout.HelpBox("このコンポーネントを正しく動作させるには、アバター内に配置する必要があります。", MessageType.Warning);
         }
 
@@ -116,8 +125,13 @@ public class RemoveMeshHelperEditor : Editor
             {
                 if (removeMeshHelper.selectNum != 0)
                 {
-                    if (removeMeshHelper.attachObject != null) SetRemoveMeshBox(removeMeshHelper, removeMeshHelper.attachObject);
-                    EditorUtility.SetDirty(removeMeshHelper);
+                    if (removeMeshHelper.attachObject != null) 
+                    {
+                        SetRemoveMeshBox(removeMeshHelper, removeMeshHelper.attachObject);
+                        var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+                        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+                    }
+                    //EditorUtility.SetDirty(removeMeshHelper);
                 }
             }
         }
@@ -125,9 +139,9 @@ public class RemoveMeshHelperEditor : Editor
         isEditBoxMode = GUILayout.Toggle(isEditBoxMode, "ポリゴンの削除範囲を編集する");
 
 
-        if (EditorGUI.EndChangeCheck())//編集結果の保存に必要な関数
+        if (EditorGUI.EndChangeCheck())//ユーザーがインスペクタを操作した時の編集結果の保存に必要な関数
         {
-            EditorUtility.SetDirty(removeMeshHelper);
+            Undo.RecordObject(target, "Changed Remove Mesh Helper");
         }
 
 
