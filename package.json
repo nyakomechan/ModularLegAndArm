@@ -6,7 +6,7 @@
     "name": "Nyakome"
   },
   "unity": "2022.3",
-  "description": "A tool for replacing a avatar regs and arms and changing the length of limbs.",
+  "description": "A tool for non-destructive avatar legs and arms replacement.",
   "vpmDependencies": {
     "com.vrchat.avatars": "3.x.x",
     "com.anatawa12.avatar-optimizer": "1.x.x"

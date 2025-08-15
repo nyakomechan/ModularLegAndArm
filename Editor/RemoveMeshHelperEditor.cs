@@ -79,12 +79,12 @@ namespace nyakomake.ModularLegAndArm.editor
                         }
                         EditorUtility.SetDirty(removeMeshHelper);
                     }
-                    else if (newSelectNum == 0)
-                    {
-                        removeMeshHelper.selectNum = 0;
-                        if (removeMeshHelper.removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshHelper.removeMeshInBox);
-                        EditorUtility.SetDirty(removeMeshHelper);
-                    }
+                    // else if (newSelectNum == 0)
+                    // {
+                    //     removeMeshHelper.selectNum = 0;
+                    //     if (removeMeshHelper.removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshHelper.removeMeshInBox);
+                    //     EditorUtility.SetDirty(removeMeshHelper);
+                    // }
 
 
                 }
@@ -147,7 +147,7 @@ namespace nyakomake.ModularLegAndArm.editor
         //skinnedMeshコンポーネントを持つオブジェクトにRemoveMeshInBoxコンポーネントをアタッチしポリゴンを削除する箱状の範囲をセットする
         void SetRemoveMeshBox(RemoveMeshHelper removeMeshHelper, GameObject skinnedMeshObject)
         {
-
+            if (removeMeshHelper.pivotObj == null) return;
             RemoveMeshInBox removeMeshInBox = removeMeshHelper.removeMeshInBox;
             if (removeMeshHelper.removeMeshInBox == null)
             {
@@ -156,8 +156,10 @@ namespace nyakomake.ModularLegAndArm.editor
             }
             RemoveMeshInBox.BoundingBox boundingBox = new RemoveMeshInBox.BoundingBox();
 
-            boundingBox.Center = removeMeshHelper.attachObject.transform.InverseTransformPoint(removeMeshHelper.transform.position + removeMeshHelper.removeMeshBox.Center);
-            Vector3 scale = new Vector3(removeMeshHelper.removeMeshBox.Size.x * removeMeshHelper.transform.lossyScale.x, removeMeshHelper.removeMeshBox.Size.y * removeMeshHelper.transform.lossyScale.y, removeMeshHelper.removeMeshBox.Size.z * removeMeshHelper.transform.lossyScale.z);
+            //boundingBox.Center = removeMeshHelper.attachObject.transform.InverseTransformPoint(removeMeshHelper.pivotObj.transform.position + removeMeshHelper.removeMeshBox.Center);
+            boundingBox.Center = removeMeshHelper.attachObject.transform.InverseTransformPoint(removeMeshHelper.pivotObj.transform.position);
+            //boundingBox.Center = new Vector3( boundingBox.Center.x * removeMeshHelper.transform.lossyScale.x,  boundingBox.Center.y * removeMeshHelper.transform.lossyScale.y,  boundingBox.Center.z * removeMeshHelper.transform.lossyScale.z);
+            Vector3 scale = new Vector3(removeMeshHelper.removeMeshBox.Size.x * removeMeshHelper.transform.lossyScale.x/ removeMeshHelper.attachObject.transform.lossyScale.x, removeMeshHelper.removeMeshBox.Size.y * removeMeshHelper.transform.lossyScale.y/ removeMeshHelper.attachObject.transform.lossyScale.y, removeMeshHelper.removeMeshBox.Size.z * removeMeshHelper.transform.lossyScale.z/ removeMeshHelper.attachObject.transform.lossyScale.z);
             boundingBox.Size = scale;
             boundingBox.Rotation = removeMeshHelper.transform.rotation * Quaternion.Euler(removeMeshHelper.removeMeshBox.Rotation);
             removeMeshInBox.Boxes = new RemoveMeshInBox.BoundingBox[] { boundingBox };
@@ -221,8 +223,9 @@ namespace nyakomake.ModularLegAndArm.editor
         static void DrawGizmo(RemoveMeshHelper scr, GizmoType gizmoType)
         {
             if (scr.attachObject == null) return;
+            if (scr.pivotObj == null) return;
 
-            Vector3 position = scr.transform.position + scr.removeMeshBox.Center;
+            Vector3 position = scr.pivotObj.transform.position;
             Vector3 scale = new Vector3(scr.removeMeshBox.Size.x * scr.transform.lossyScale.x, scr.removeMeshBox.Size.y * scr.transform.lossyScale.y, scr.removeMeshBox.Size.z * scr.transform.lossyScale.z);
 
             Anatawa12.AvatarOptimizer.Matrix4x4 worldmatrix = Anatawa12.AvatarOptimizer.Matrix4x4.TRS(position, scr.transform.rotation * Quaternion.Euler(scr.removeMeshBox.Rotation), scale);
@@ -243,14 +246,16 @@ namespace nyakomake.ModularLegAndArm.editor
 
             EditorGUI.BeginChangeCheck();//編集結果の保存に必要な関数
 
-            Vector3 pos = removeMeshHelper.removeMeshBox.Center + removeMeshHelper.transform.position;
+            Vector3 pos = removeMeshHelper.pivotObj.transform.position;
             Vector3 size = removeMeshHelper.removeMeshBox.Size;
             Quaternion rot = removeMeshHelper.transform.rotation * Quaternion.Euler(removeMeshHelper.removeMeshBox.Rotation);
             Handles.TransformHandle(ref pos, ref rot, ref size);
             if (EditorGUI.EndChangeCheck())//編集結果の保存に必要な関数
             {
                 Undo.RecordObject(removeMeshHelper, "Change Look At Target Position");
-                removeMeshHelper.removeMeshBox.Center = pos - removeMeshHelper.transform.position;
+                
+                removeMeshHelper.pivotObj.transform.position = pos;
+                removeMeshHelper.removeMeshBox.Center = removeMeshHelper.pivotObj.transform.position;
                 removeMeshHelper.removeMeshBox.Size = size;
                 removeMeshHelper.removeMeshBox.Rotation = (Quaternion.Inverse(removeMeshHelper.transform.rotation) * rot).eulerAngles;
             }

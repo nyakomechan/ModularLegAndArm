@@ -15,6 +15,7 @@ namespace nyakomake.ModularLegAndArm
         public RemoveMeshInBox removeMeshInBox;
         public int selectNum;
         public bool deleteMeshBoxOnDestroy = true;
+        public GameObject pivotObj;
 
         [System.Serializable]
         public struct RemoveMeshBox
@@ -32,6 +33,7 @@ namespace nyakomake.ModularLegAndArm
             removeMeshBox.Size = Vector3.one;
             removeMeshBox.Rotation = Vector3.zero;
             deleteMeshBoxOnDestroy = true;
+
         }
 
 #if UNITY_EDITOR
@@ -41,6 +43,19 @@ namespace nyakomake.ModularLegAndArm
             // Hierarchy変更イベント購読
             EditorApplication.hierarchyChanged += OnHierarchyChanged;
             deleteMeshBoxOnDestroy = true;
+            foreach (Transform t in this.transform)
+            {
+                if (t.name == "removeMeshHelperPivot_Do not delete!") pivotObj = t.gameObject;
+            }
+            if (pivotObj == null)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Packages/com.nyakomake.modular-leg-and-arm/pivot.prefab");
+                pivotObj = UnityEditor.PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+                pivotObj.name = "removeMeshHelperPivot_Do not delete!";
+                pivotObj.transform.SetParent(this.transform);
+                pivotObj.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                pivotObj.transform.localScale = Vector3.one;
+            }
 
         }
 
@@ -78,7 +93,7 @@ namespace nyakomake.ModularLegAndArm
         {
             if (!deleteMeshBoxOnDestroy) return;
             if (removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshInBox);
-
+            if (pivotObj != null) Undo.DestroyObjectImmediate(pivotObj);
         }
 #endif
 
