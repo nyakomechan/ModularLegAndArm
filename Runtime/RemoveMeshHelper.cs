@@ -5,76 +5,83 @@ using UnityEditor;
 using Anatawa12.AvatarOptimizer;
 using UnityEngine.EventSystems;
 using VRC.SDKBase;
-[ExecuteAlways]
-public class RemoveMeshHelper : MonoBehaviour, VRC.SDKBase.IEditorOnly
+
+namespace nyakomake.ModularLegAndArm
 {
-    public GameObject attachObject;
-    public RemoveMeshInBox removeMeshInBox;
-    public int selectNum;
-
-    [System.Serializable]
-    public struct RemoveMeshBox
+    [ExecuteAlways]
+    public class RemoveMeshHelper : MonoBehaviour, VRC.SDKBase.IEditorOnly
     {
-        public Vector3 Center;
-        public Vector3 Size;
-        public Vector3 Rotation;
-    }
+        public GameObject attachObject;
+        public RemoveMeshInBox removeMeshInBox;
+        public int selectNum;
+        public bool deleteMeshBoxOnDestroy = true;
 
-    public RemoveMeshBox removeMeshBox;
-
-    void Reset()
-    {
-        removeMeshBox.Center = new Vector3(0, 1f, 0);
-        removeMeshBox.Size = Vector3.one;
-        removeMeshBox.Rotation = Vector3.zero;
-    }
-
-
-    void OnEnable()
-    {
-        // Hierarchy変更イベント購読
-        EditorApplication.hierarchyChanged += OnHierarchyChanged;
-    }
-
-    void OnDisable()
-    {
-        // イベント購読解除
-        EditorApplication.hierarchyChanged -= OnHierarchyChanged;
-
-    }
-
-    private void OnHierarchyChanged()
-    {
-        if (!Application.isPlaying)
+        [System.Serializable]
+        public struct RemoveMeshBox
         {
-            var rootObj = GetRootTransform();
-            if (rootObj == null)
+            public Vector3 Center;
+            public Vector3 Size;
+            public Vector3 Rotation;
+        }
+
+        public RemoveMeshBox removeMeshBox;
+
+        void Reset()
+        {
+            removeMeshBox.Center = new Vector3(0, 1f, 0);
+            removeMeshBox.Size = Vector3.one;
+            removeMeshBox.Rotation = Vector3.zero;
+            deleteMeshBoxOnDestroy = true;
+        }
+
+#if UNITY_EDITOR
+        void OnEnable()
+        {
+
+            // Hierarchy変更イベント購読
+            EditorApplication.hierarchyChanged += OnHierarchyChanged;
+            deleteMeshBoxOnDestroy = true;
+
+        }
+
+        void OnDisable()
+        {
+            // イベント購読解除
+            EditorApplication.hierarchyChanged -= OnHierarchyChanged;
+
+        }
+
+        private void OnHierarchyChanged()
+        {
+            if (!Application.isPlaying)
             {
-                if (removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshInBox);
+                var rootObj = GetRootTransform();
+                if (rootObj == null)
+                {
+                    if (removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshInBox);
+                }
             }
         }
-    }
-    Transform GetRootTransform()
-    {
-        var rootObject = transform;
-        while (rootObject != null)
+#endif
+        Transform GetRootTransform()
         {
-            if (rootObject.GetComponent<VRC_AvatarDescriptor>() != null) break;
-            rootObject = rootObject.transform.parent;
+            var rootObject = transform;
+            while (rootObject != null)
+            {
+                if (rootObject.GetComponent<VRC_AvatarDescriptor>() != null) break;
+                rootObject = rootObject.transform.parent;
+            }
+            return rootObject;
         }
-        return rootObject;
-    }
-
-    void OnDestroy()
-    {
-        if (!Application.isPlaying)
+#if UNITY_EDITOR
+        void OnDestroy()
         {
-
+            if (!deleteMeshBoxOnDestroy) return;
             if (removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshInBox);
 
         }
+#endif
+
+
     }
-
-
-
 }

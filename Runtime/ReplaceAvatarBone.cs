@@ -4,12 +4,15 @@ using nyakomake;
 using UnityEngine;
 using nadena.dev.modular_avatar.core;
 
-[RequireComponent(typeof(ModularAvatarBoneProxy))]
-public class ReplaceAvatarBone : HumanoidBoneAdjuster
+namespace nyakomake.ModularLegAndArm
 {
-    void Reset()
+    [RequireComponent(typeof(ModularAvatarBoneProxy))]
+    public class ReplaceAvatarBone : HumanoidBoneAdjuster
     {
-        refPosRotTransform = transform;
-        adjustType = AdjustType.PositionAndRotation;
+        void Reset()
+        {
+            refPosRotTransform = transform;
+            adjustType = AdjustType.PositionAndRotation;
+        }
     }
 }

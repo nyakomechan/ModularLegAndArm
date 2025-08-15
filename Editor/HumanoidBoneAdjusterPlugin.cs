@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.Object;
 using nadena.dev.ndmf;
-using nyakomake;
+using nyakomake.ModularLegAndArm.editor;
 using System;
 using System.Linq;
 using UnityEditor;
@@ -11,7 +11,7 @@ using VRC.SDKBase;
 using nadena.dev.modular_avatar.core;
 [assembly: ExportsPlugin(typeof(HumanoidBoneAdjusterPlugin))]
 
-namespace nyakomake
+namespace nyakomake.ModularLegAndArm.editor
 {
     public class HumanoidBoneAdjusterPlugin : Plugin<HumanoidBoneAdjusterPlugin>
     {

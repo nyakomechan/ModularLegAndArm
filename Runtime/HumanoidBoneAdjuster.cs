@@ -5,7 +5,8 @@ using System.Linq;
 using UnityEditor;
 using System;
 using VRC.SDKBase;
-namespace nyakomake
+
+namespace nyakomake.ModularLegAndArm
 {
     public class HumanoidBoneAdjuster : MonoBehaviour, IEditorOnly
     {

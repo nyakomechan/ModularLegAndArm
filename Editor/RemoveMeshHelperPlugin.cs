@@ -4,10 +4,12 @@ using UnityEngine;
 using UnityEditor;
 using nadena.dev.ndmf;
 using static UnityEngine.Object;
+using nyakomake.ModularLegAndArm;
+
 [assembly: ExportsPlugin(typeof(RemoveMeshHelperPlugin))]
 public class RemoveMeshHelperPlugin : Plugin<RemoveMeshHelperPlugin>
 {
-    
+
     protected override void Configure()
     {
         InPhase(BuildPhase.Transforming)
@@ -17,6 +19,7 @@ public class RemoveMeshHelperPlugin : Plugin<RemoveMeshHelperPlugin>
                     var removeMeshHelpers = ctx.AvatarRootObject.GetComponentsInChildren<RemoveMeshHelper>();
                     foreach (RemoveMeshHelper removeMeshHelper in removeMeshHelpers)
                     {
+                        removeMeshHelper.deleteMeshBoxOnDestroy = false;
                         DestroyImmediate(removeMeshHelper);
                     }
                 });

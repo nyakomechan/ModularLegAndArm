@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using VRC.SDKBase;
 using Anatawa12.AvatarOptimizer;
-using HarmonyLib;
 using System;
 using System.Text.RegularExpressions;
-
+using nyakomake;
 #if UNITY_EDITOR
 
+namespace nyakomake.ModularLegAndArm.editor
+{
 [CustomEditor(typeof(RemoveMeshHelper))] // MonoBehaviourを継承したスクリプトにアタッチできるようにする
 public class RemoveMeshHelperEditor : Editor
 {
@@ -224,7 +225,7 @@ public class RemoveMeshHelperEditor : Editor
         Vector3 position = scr.transform.position + scr.removeMeshBox.Center;
         Vector3 scale = new Vector3(scr.removeMeshBox.Size.x * scr.transform.lossyScale.x, scr.removeMeshBox.Size.y * scr.transform.lossyScale.y, scr.removeMeshBox.Size.z * scr.transform.lossyScale.z);
 
-        Matrix4x4 worldmatrix = Matrix4x4.TRS(position, scr.transform.rotation * Quaternion.Euler(scr.removeMeshBox.Rotation), scale);
+        Anatawa12.AvatarOptimizer.Matrix4x4 worldmatrix = Anatawa12.AvatarOptimizer.Matrix4x4.TRS(position, scr.transform.rotation * Quaternion.Euler(scr.removeMeshBox.Rotation), scale);
 
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.matrix = worldmatrix;
@@ -255,11 +256,7 @@ public class RemoveMeshHelperEditor : Editor
         }
     }
 
-
-
-
-
-
+}
 }
 
 #endif

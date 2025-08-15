@@ -1,20 +1,38 @@
 {
-    "name": "nyakomake.ModularLegAndArm",
+    "name": "nyakomake.ModularLegAndArm.editor",
     "rootNamespace": "",
     "references": [
         "GUID:7e6b618db39145b8a5eb4790d78c2972",
         "GUID:f69eeb3e25674f4a9bd20e6d7e69e0e6",
         "GUID:5ce33783346c3124990afbe7b0390a06",
         "GUID:fc900867c0f47cd49b6e2ae4ef907300",
-        "GUID:e2b7b920896b58a43a4015eacb377e19"
+        "GUID:e2b7b920896b58a43a4015eacb377e19",
+        "GUID:fe747755f7b44e048820525b07f9b956",
+        "GUID:62ced99b048af7f4d8dfe4bed8373d76",
+        "GUID:901e56b065a857d4483a77f8cae73588",
+        "GUID:1fa93655444345a5b6c18739bc3c2e5b",
+        "GUID:5718fb738711cd34ea54e9553040911d",
+        "GUID:b906909fcc54f634db50f2cad0f988d9",
+        "GUID:3456780c4fb2d324ab9c633d6f1b0ddb",
+        "GUID:6e9c6119ac4eb334284fb7b4bc6d1f05",
+        "GUID:2665a8d13d1b3f18800f46e256720795",
+        "GUID:b75d3cd3037d383a8d1e2f9a26d73d8a",
+        "GUID:343deaaf83e0cee4ca978e7df0b80d21"
     ],
-    "includePlatforms": [],
-    "excludePlatforms": [
+    "includePlatforms": [
         "Editor"
     ],
+    "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "VRCSDKBase.dll",
+        "VRCSDK3A.dll",
+        "VRC.Dynamics.dll",
+        "VRC.SDK3.Dynamics.Contact.dll",
+        "VRC.SDK3.Dynamics.PhysBone.dll",
+        "System.Collections.Immutable.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
