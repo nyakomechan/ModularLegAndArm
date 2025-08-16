@@ -306,7 +306,7 @@ namespace nyakomake.ModularLegAndArm
                 if (bone.name == leftFootBoneName)
                 {
                     if (bone.childCount == 0) leftToeLerfYPos = bone.position.y;
-                    else if(bone.GetChild(0).childCount == 0) leftToeLerfYPos = bone.GetChild(0).transform.position.y;
+                    else if (bone.GetChild(0).childCount == 0) leftToeLerfYPos = bone.GetChild(0).transform.position.y;
                     else leftToeLerfYPos = bone.GetChild(0).GetChild(0).transform.position.y;
                     Debug.Log("leftToeLerfYPos " + bone.position.y);
                 }
@@ -328,10 +328,11 @@ namespace nyakomake.ModularLegAndArm
                     Debug.Log("leftToeLerfYPos " + bone.position.y);
                 }
             }
-            float hipsY =rootYPos -leftToeLerfYPos;
+            float hipsY = rootYPos - leftToeLerfYPos;
             //if(eyeYOffset != float.MaxValue)eyeYOffset = rootYPos - leftToeLerfYPos;
             Debug.Log("eyeYOffset : " + eyeYOffset);
             Debug.Log("hipsY : " + eyeYOffset);
+
 
             Debug.Log("--changePosRotBoneNames--");
             foreach (string str in changePosRotBoneNames)
@@ -360,7 +361,15 @@ namespace nyakomake.ModularLegAndArm
 
                     if (bone.name == hipBoneName)
                     {
-                        skelBone.position = baseSkeltonBonesDic[bone.name].rotation*rootRot* new Vector3(0, eyeYOffset*baseSkeltonBonesDic[bone.name].scale.y, 0)+baseSkeltonBonesDic[bone.name].position;
+                        if (eyeYOffset > 100 || eyeYOffset < -100)
+                        {
+                            skelBone.position = baseSkeltonBonesDic[bone.name].position;
+                            eyeYOffset = 0;
+                        }
+                        else
+                        {
+                            skelBone.position = baseSkeltonBonesDic[bone.name].rotation * rootRot * new Vector3(0, eyeYOffset * baseSkeltonBonesDic[bone.name].scale.y, 0) + baseSkeltonBonesDic[bone.name].position;
+                        }
 
                         skelBone.rotation = baseSkeltonBonesDic[bone.name].rotation;
                         skelBone.scale = baseSkeltonBonesDic[bone.name].scale;
