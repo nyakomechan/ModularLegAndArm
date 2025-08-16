@@ -75,7 +75,13 @@ namespace nyakomake.ModularLegAndArm
                 {
                     if (removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshInBox);
                 }
+                var _pivotObj = GameObject.Find("/removeMeshHelperPivot_Do not delete!");
+                if (_pivotObj != null)
+                {
+                    Undo.DestroyObjectImmediate(_pivotObj);
+                }
             }
+
         }
 #endif
         Transform GetRootTransform()
