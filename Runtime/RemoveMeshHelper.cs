@@ -78,7 +78,7 @@ namespace nyakomake.ModularLegAndArm
                 var _pivotObj = GameObject.Find("/removeMeshHelperPivot_Do not delete!");
                 if (_pivotObj != null)
                 {
-                    Undo.DestroyObjectImmediate(_pivotObj);
+                    DestroyImmediate(_pivotObj);
                 }
             }
 
