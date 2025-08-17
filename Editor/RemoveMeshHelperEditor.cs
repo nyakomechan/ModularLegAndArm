@@ -79,12 +79,11 @@ namespace nyakomake.ModularLegAndArm.editor
                         }
                         EditorUtility.SetDirty(removeMeshHelper);
                     }
-                    // else if (newSelectNum == 0)
-                    // {
-                    //     removeMeshHelper.selectNum = 0;
-                    //     if (removeMeshHelper.removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshHelper.removeMeshInBox);
-                    //     EditorUtility.SetDirty(removeMeshHelper);
-                    // }
+                    else if (newSelectNum == 0)
+                    {
+                        removeMeshHelper.selectNum = 0;
+                        if (removeMeshHelper.removeMeshInBox != null) Undo.DestroyObjectImmediate(removeMeshHelper.removeMeshInBox);
+                    }
 
 
                 }
