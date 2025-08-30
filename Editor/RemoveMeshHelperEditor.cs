@@ -156,11 +156,13 @@ namespace nyakomake.ModularLegAndArm.editor
             RemoveMeshInBox.BoundingBox boundingBox = new RemoveMeshInBox.BoundingBox();
 
             //boundingBox.Center = removeMeshHelper.attachObject.transform.InverseTransformPoint(removeMeshHelper.pivotObj.transform.position + removeMeshHelper.removeMeshBox.Center);
+            Debug.Log(removeMeshHelper.attachObject.name);
             boundingBox.Center = removeMeshHelper.attachObject.transform.InverseTransformPoint(removeMeshHelper.pivotObj.transform.position);
             //boundingBox.Center = new Vector3( boundingBox.Center.x * removeMeshHelper.transform.lossyScale.x,  boundingBox.Center.y * removeMeshHelper.transform.lossyScale.y,  boundingBox.Center.z * removeMeshHelper.transform.lossyScale.z);
             Vector3 scale = new Vector3(removeMeshHelper.removeMeshBox.Size.x * removeMeshHelper.transform.lossyScale.x/ removeMeshHelper.attachObject.transform.lossyScale.x, removeMeshHelper.removeMeshBox.Size.y * removeMeshHelper.transform.lossyScale.y/ removeMeshHelper.attachObject.transform.lossyScale.y, removeMeshHelper.removeMeshBox.Size.z * removeMeshHelper.transform.lossyScale.z/ removeMeshHelper.attachObject.transform.lossyScale.z);
             boundingBox.Size = scale;
-            boundingBox.Rotation = removeMeshHelper.transform.rotation * Quaternion.Euler(removeMeshHelper.removeMeshBox.Rotation);
+            
+            boundingBox.Rotation = removeMeshHelper.transform.rotation * Quaternion.Euler(removeMeshHelper.removeMeshBox.Rotation) * removeMeshHelper.attachObject.transform.rotation;
             removeMeshInBox.Boxes = new RemoveMeshInBox.BoundingBox[] { boundingBox };
             removeMeshHelper.removeMeshInBox = removeMeshInBox;
         }
@@ -232,14 +234,15 @@ namespace nyakomake.ModularLegAndArm.editor
             Gizmos.color = new Color(1, 0, 0, 0.5f);
             Gizmos.matrix = worldmatrix;
             Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
-            Debug.Log("OnDrawGizmosSelected");
         }
 
 
         //ポリゴンを削除する箱状の範囲をエディタ上で編集するハンドルを表示する
         protected virtual void OnSceneGUI()
         {
+            Debug.Log("OnSceneGUI");
             if (!isEditBoxMode) return;
+            Debug.Log("EditBoxMode");
             removeMeshHelper = (RemoveMeshHelper)target;
 
 
