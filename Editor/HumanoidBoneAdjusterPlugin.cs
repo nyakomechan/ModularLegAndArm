@@ -25,19 +25,19 @@ namespace nyakomake
                     Transform hipsTransform = ctx.AvatarRootObject.GetComponent<Animator>().GetBoneTransform(HumanBodyBones.Hips);
                     Transform armatureTransform = hipsTransform.parent;
                     List<Transform> armatureChildren = new List<Transform>();
-                    foreach(Transform child in armatureTransform)
+                    foreach (Transform child in armatureTransform)
                     {
                         child.SetParent(null);
                         armatureChildren.Add(child);
 
                     }
                     armatureTransform.rotation = Quaternion.identity;
-                    foreach(Transform child in armatureChildren)
+                    foreach (Transform child in armatureChildren)
                     {
                         child.SetParent(armatureTransform);
 
                     }
-                    
+
                     var humanoidBoneAdjusters = ctx.AvatarRootObject.GetComponentsInChildren<HumanoidBoneAdjuster>();
                     if (humanoidBoneAdjusters != null && humanoidBoneAdjusters.Length > 0)
                     {
@@ -50,15 +50,17 @@ namespace nyakomake
                         foreach (ReplaceAvatarBone bone in replaceAvatarBones)
                         {
                             bone.ApplyChangePosRotHumanBone();
-                            if(bone.gameObject.GetComponent<ModularAvatarBoneProxy>() != null)
+                            if (bone.gameObject.GetComponent<ModularAvatarBoneProxy>() != null)
                             {
-                                if(bone.gameObject.GetComponent<ModularAvatarBoneProxy>().boneReference == HumanBodyBones.LeftToes)
+                                if (bone.gameObject.GetComponent<ModularAvatarBoneProxy>().boneReference == HumanBodyBones.LeftToes)
                                 {
                                     eyeYOffset = -bone.gameObject.transform.position.y;
-                                    Debug.Log("!eyeYOffset! : "+eyeYOffset);
+                                    Debug.Log("!eyeYOffset! : " + eyeYOffset);
                                 }
+
                             }
                         }
+
                         Avatar avatar = CreateHumanoidBoneAdjustAvatar(ctx.AvatarRootObject, humanoidBoneAdjusters, ref eyeYOffset);
                         if (avatar == null) Debug.Log("avatar is null!");
 
@@ -96,6 +98,8 @@ namespace nyakomake
             sourceObject_clone.AddComponent<Animator>();
             sourceObject_clone.GetComponent<Animator>().applyRootMotion = true;
             sourceObject_clone.GetComponent<Animator>().avatar = sourceObject.GetComponent<Animator>().avatar;
+            sourceObject_clone.name = sourceObject.name;
+            sourceObject_clone.transform.position = sourceObject.transform.position;
 
             var humanoidBoneListInObject = GetMappedBoneList(sourceObject_clone);
             ExecuteDeleteObjectWithoutList(sourceObject_clone.transform, humanoidBoneListInObject);
@@ -106,8 +110,87 @@ namespace nyakomake
             foreach (HumanoidBoneAdjuster bone in humanoidBoneAdjusters)
             {
                 ChangePosRotHumanBone bone_ = new ChangePosRotHumanBone();
-                bone_.refPosRotTransform = bone.refPosRotTransform;
+                if (bone.isKeepOriginalBonePosRot)
+                {
+                    if (bone.transform.parent.GetComponent<HumanoidBoneAdjuster>() == null)
+                    {
+                        Transform cloneBoneRoot = Instantiate(sourceObject_clone.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones));
+                        cloneBoneRoot.SetParent(sourceObject_clone.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones).parent);
+                        cloneBoneRoot.SetPositionAndRotation(bone.transform.position, bone.transform.rotation);
+                        cloneBoneRoot.name = sourceObject_clone.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones).name + "_add";
+                        //cloneBoneRoot.name = sourceObject_clone.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones).name;
+                        //sourceObject_clone.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones).name += "_orig";
+                        //cloneBoneRoot.SetSiblingIndex(0);
+
+                        bone_.refPosRotTransform = cloneBoneRoot;
+                        AddSuffixToChildren(cloneBoneRoot, "_add");
+                        //AddSuffixToChildren(sourceObject_clone.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones),"_orig");
+
+                        Transform replaceeBoneRoot = Instantiate(sourceObject.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones));
+                        replaceeBoneRoot.SetParent(sourceObject.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones).parent);
+                        replaceeBoneRoot.SetPositionAndRotation(bone.transform.position, bone.transform.rotation);
+                        replaceeBoneRoot.name = sourceObject.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones).name + "_add";
+                        //replaceeBoneRoot.name = sourceObject.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones).name;
+                        //sourceObject.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones).name += "_orig";
+                        //replaceeBoneRoot.SetSiblingIndex(0);
+
+                        AddSuffixToChildren(replaceeBoneRoot, "_add");
+                        //AddSuffixToChildren(sourceObject.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones),"_orig");
+
+                        if(bone.GetComponent<ModularAvatarBoneProxy>()!=null)
+                        {
+                            bone.GetComponent<ModularAvatarBoneProxy>().target = replaceeBoneRoot;
+                        }
+                    }
+                    else
+                    {
+
+                        Transform addBoneRoot = bone.refPosRotTransform;
+                        HumanBodyBones rootHumanBodyBone;
+                        while (true)
+                        {
+                            //元のオブジェクトから置き換えるボーンのルートTransformを探す
+                            addBoneRoot = addBoneRoot.parent;
+                            if (addBoneRoot.parent.GetComponent<HumanoidBoneAdjuster>() == null)
+                            {
+                                //クローンボーンのルートTransformをsourceObject_cloneからHumanBodyBone経由で取得
+                                rootHumanBodyBone = addBoneRoot.gameObject.GetComponent<HumanoidBoneAdjuster>().humanBodyBones;
+
+                                break;
+                            }
+                        }
+                        Transform source_sourceBoneRoot = null;
+                        Transform source_addBoneRoot = null;
+                        Transform clone_sourceBoneRoot = null;
+                        Transform clone_addBoneRoot = null;
+                        Transform sourceBoneRoot = bone.refPosRotTransform;
+                        clone_sourceBoneRoot = sourceObject_clone.GetComponent<Animator>().GetBoneTransform(rootHumanBodyBone);
+                        clone_addBoneRoot = clone_sourceBoneRoot.parent.Find(clone_sourceBoneRoot.name + "_add");
+                        string clone_addBonePath = GetRelativePath(clone_sourceBoneRoot, sourceObject_clone.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones), "_add");
+                        Transform cloneAddBoneTransform = clone_addBoneRoot.Find(clone_addBonePath);
+                        cloneAddBoneTransform.SetPositionAndRotation(bone.transform.position, bone.transform.rotation);
+                        bone_.refPosRotTransform = cloneAddBoneTransform;
+                        Debug.Log("cloneAddBonePath : " + GetTransformPath(cloneAddBoneTransform) + ",humanBodyBones : " + bone.humanBodyBones);
+
+                        source_sourceBoneRoot = sourceObject.GetComponent<Animator>().GetBoneTransform(rootHumanBodyBone);
+                        source_addBoneRoot = source_sourceBoneRoot.parent.Find(source_sourceBoneRoot.name + "_add");
+                        string source_addBonePath = GetRelativePath(source_sourceBoneRoot, sourceObject.GetComponent<Animator>().GetBoneTransform(bone.humanBodyBones), "_add");
+                        Transform addBoneTransform = source_addBoneRoot.Find(source_addBonePath);
+                        addBoneTransform.SetPositionAndRotation(bone.transform.position, bone.transform.rotation);
+                        Debug.Log("addBonePath : " + GetTransformPath(addBoneTransform) + ",humanBodyBones : " + bone.humanBodyBones);
+
+                        if(bone.GetComponent<ModularAvatarBoneProxy>()!=null)
+                        {
+                            bone.GetComponent<ModularAvatarBoneProxy>().target = addBoneTransform;
+                        }
+                    }
+                }
+                else
+                {
+                    bone_.refPosRotTransform = bone.refPosRotTransform;
+                }
                 bone_.humanBodyBones = bone.humanBodyBones;
+                bone_.isKeepOriginalBonePosRot = bone.isKeepOriginalBonePosRot;
                 changePosRotHumanBones_.Add(bone_);
             }
             //eyeYOffset = 0f;
@@ -201,6 +284,23 @@ namespace nyakomake
             }
         }
 
+        void AddSuffixToChildren(Transform parent, string suffix)
+        {
+            foreach (Transform child in parent)
+            {
+                child.name += suffix;
+
+                // 孫以下も処理する場合
+                if (child.childCount > 0)
+                {
+                    AddSuffixToChildren(child, suffix);
+                }
+            }
+        }
+
+
+
+
 
 
         // Transform の絶対パスを文字列で取得するヘルパー関数
@@ -241,6 +341,20 @@ namespace nyakomake
                     if (childTransform != null) DestroyImmediate(childTransform.gameObject);
                 }
             }
+        }
+
+        string GetRelativePath(Transform parent, Transform child, String suffix)
+        {
+            List<string> path = new List<string>();
+            Transform current = child;
+
+            while (current != parent && current != null)
+            {
+                path.Insert(0, current.name + suffix);
+                current = current.parent;
+            }
+
+            return string.Join("/", path);
         }
 
         /*

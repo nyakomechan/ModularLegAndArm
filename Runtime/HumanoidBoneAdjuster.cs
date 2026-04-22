@@ -21,6 +21,7 @@ namespace nyakomake
         public HumanBodyBones humanBodyBones;
         public Transform refPosRotTransform;
         public AdjustType adjustType;
+        public bool isKeepOriginalBonePosRot = false;
 
 
         void Reset()
@@ -44,6 +45,8 @@ namespace nyakomake
         [ContextMenu("ApplyChangePosRotHumanBone")]
         public void ApplyChangePosRotHumanBone()
         {
+            if (isKeepOriginalBonePosRot) return;
+
             rootObject = GetRootObject();
             Animator animator = rootObject.GetComponent<Animator>();
 
@@ -70,6 +73,19 @@ namespace nyakomake
             //Debug.Log("adjustBone : " + boneTransform.name);
             //Debug.Log("adjustPos : " + boneTransform.position.x + "," + boneTransform.position.y + "," + boneTransform.position.z);
 
+        }
+        string GetRelativePath(Transform parent, Transform child, String suffix)
+        {
+            List<string> path = new List<string>();
+            Transform current = child;
+
+            while (current != parent && current != null)
+            {
+                path.Insert(0, current.name + suffix);
+                current = current.parent;
+            }
+
+            return string.Join("/", path);
         }
         [ContextMenu("RevertChangePosRotHumanBone")]
         public void RevertChangePosRotHumanBone()

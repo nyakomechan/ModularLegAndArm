@@ -13,6 +13,7 @@ namespace nyakomake
     {
         public HumanBodyBones humanBodyBones;
         public Transform refPosRotTransform;
+        public bool isKeepOriginalBonePosRot;
     }
     public class HumanoidAvatarBuilder
     {
@@ -143,11 +144,17 @@ namespace nyakomake
                     if (animator.GetBoneTransform(bone.humanBodyBones) == null) continue;
                     //if (_transformDefinision[HumanTrait.BoneName[(int)bone.humanBodyBones]].Contaions(animator.GetBoneTransform(bone.humanBodyBones).name)) continue;
 
-                    _transformDefinision[HumanTrait.BoneName[(int)bone.humanBodyBones]] = animator.GetBoneTransform(bone.humanBodyBones).name;
-
-
-                    changePosRotBoneNames.Add(animator.GetBoneTransform(bone.humanBodyBones).name);
-
+                    if (bone.isKeepOriginalBonePosRot)
+                    {
+                        _transformDefinision[HumanTrait.BoneName[(int)bone.humanBodyBones]] = bone.refPosRotTransform.name;
+                        changePosRotBoneNames.Add(bone.refPosRotTransform.name);
+                        Debug.Log("SetupBones_PosRotChange : " + bone.refPosRotTransform.name);
+                    }
+                    else
+                    {
+                        _transformDefinision[HumanTrait.BoneName[(int)bone.humanBodyBones]] = animator.GetBoneTransform(bone.humanBodyBones).name;
+                        changePosRotBoneNames.Add(animator.GetBoneTransform(bone.humanBodyBones).name);
+                    }
                     //Debug.Log("changePosRotBoneName : " + animator.GetBoneTransform(bone.humanBodyBones).name);
                 }
             }
@@ -306,7 +313,7 @@ namespace nyakomake
                 if (bone.name == leftFootBoneName)
                 {
                     if (bone.childCount == 0) leftToeLerfYPos = bone.position.y;
-                    else if(bone.GetChild(0).childCount == 0) leftToeLerfYPos = bone.GetChild(0).transform.position.y;
+                    else if (bone.GetChild(0).childCount == 0) leftToeLerfYPos = bone.GetChild(0).transform.position.y;
                     else leftToeLerfYPos = bone.GetChild(0).GetChild(0).transform.position.y;
                     Debug.Log("leftToeLerfYPos " + bone.position.y);
                 }
@@ -328,7 +335,7 @@ namespace nyakomake
                     Debug.Log("leftToeLerfYPos " + bone.position.y);
                 }
             }
-            float hipsY =rootYPos -leftToeLerfYPos;
+            float hipsY = rootYPos - leftToeLerfYPos;
             //if(eyeYOffset != float.MaxValue)eyeYOffset = rootYPos - leftToeLerfYPos;
             Debug.Log("eyeYOffset : " + eyeYOffset);
             Debug.Log("hipsY : " + eyeYOffset);
@@ -360,7 +367,7 @@ namespace nyakomake
 
                     if (bone.name == hipBoneName)
                     {
-                        skelBone.position = baseSkeltonBonesDic[bone.name].rotation*rootRot* new Vector3(0, eyeYOffset*baseSkeltonBonesDic[bone.name].scale.y, 0)+baseSkeltonBonesDic[bone.name].position;
+                        skelBone.position = baseSkeltonBonesDic[bone.name].rotation * rootRot * new Vector3(0, eyeYOffset * baseSkeltonBonesDic[bone.name].scale.y, 0) + baseSkeltonBonesDic[bone.name].position;
 
                         skelBone.rotation = baseSkeltonBonesDic[bone.name].rotation;
                         skelBone.scale = baseSkeltonBonesDic[bone.name].scale;

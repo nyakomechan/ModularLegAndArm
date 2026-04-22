@@ -18,7 +18,9 @@ public class ReplaceAvatarBoneEditor : Editor
         EditorGUILayout.LabelField(" ");
 
         replaceAvatarBone.humanBodyBones = (HumanBodyBones)EditorGUILayout.EnumPopup("置換え対象のHumanoidBone", selected: (HumanBodyBones)replaceAvatarBone.humanBodyBones);
-
+        EditorGUILayout.LabelField(" ");
+        replaceAvatarBone.isKeepOriginalBonePosRot = EditorGUILayout.Toggle("元のHumanoidBoneの位置と回転を保持する", replaceAvatarBone.isKeepOriginalBonePosRot);
+        EditorGUILayout.LabelField("有効にすると一部のModularAvatarのコンポーネントで置き換え対象のボーン（オブジェクト）を参照している場合、正しく動作しないことがあります。");
         EditorGUILayout.LabelField(" ");
         EditorGUILayout.LabelField("注意 : 一緒に追加されるMABoneProxyは削除または値の変更はしないでください。");
 

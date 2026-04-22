@@ -11,5 +11,6 @@ public class ReplaceAvatarBone : HumanoidBoneAdjuster
     {
         refPosRotTransform = transform;
         adjustType = AdjustType.PositionAndRotation;
+
     }
 }
